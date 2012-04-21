@@ -1,0 +1,70 @@
+#!/usr/bin/env perl
+
+$PROG = 'findpkgs';
+$MIRROR = $ENV{'MIRROR'} || 'mirrors.kernel.org/archlinux';
+$ARCH = $ENV{'ARCH'} || 'i686';
+@REPOS = ($ENV{'REPOS'} ? map { split } $ENV{'REPOS'} : qw/core extra community/);
+
+# search for pkgs in $repo's FTP listing
+# returns packages that were not found
+sub searchrepo
+{
+	my($repo, @pkgs) = @_;
+	$url = "ftp://$MIRROR/$repo/os/$ARCH/";
+	@ents = `curl -s $url`;
+	if($?){
+		print STDERR "$PROG: FTP listing of $repo failed\n";
+		exit 101;
+	}
+
+	%pkgs = map { ($_ => 1) } @pkgs;
+
+	ENTLOOP:
+	for(@ents){
+		chomp;
+		next unless(m{([^/]+[.]pkg[.]tar[.]xz)$});
+
+		$file = $1;
+		@fc = split /-/, $file;
+		$pkg = join '-', @fc[0 .. $#fc-3];
+
+		next ENTLOOP unless(delete $pkgs{$pkg});
+		print "$pkg\t$repo\t$file\n";
+	}
+
+	return keys %pkgs;
+}
+
+if(@ARGV == 0){
+	print STDERR "usage: $PROG [package names]\n";
+	exit 2;
+}
+
+# a repository can be specified with a forward slash
+# eg: core/perl will only search in [core]
+for(@ARGV){
+	if(m{/}){
+		($r, $p) = split m{/}, $_;
+		push @{$specific{$r}}, $p;
+	}else{
+		push @PKGS, $_;
+	}
+}
+while(($r, $parr) = each %specific){
+	@missing = searchrepo($r, @$parr);
+	if(@missing){
+		print STDERR "$PROG: failed to find in [$r]: @missing\n";
+		exit 103;
+	}
+}
+
+for $r (@REPOS){
+	exit 0 unless(@PKGS);
+	@PKGS = searchrepo($r, @PKGS);
+}
+if(@PKGS){
+	print STDERR "$PROG: failed to find: @PKGS\n";
+	exit 102;
+}else{
+	exit 0;
+}
