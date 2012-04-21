@@ -1,0 +1,51 @@
+#!/usr/bin/env perl
+
+$PROG = 'fetchpkgs';
+$MIRROR = 'mirrors.kernel.org/archlinux';
+@REPOS = qw/core extra community/;
+$ARCH = $ENV{'ARCH'} || 'i686';
+
+if(@ARGV == 0){
+	print STDERR "usage: $PROG [package names]\n";
+	exit 2;
+}
+
+%PKGS = map { ($_ => 1) } @ARGV;
+
+for $r (@REPOS){
+	$url = "ftp://$MIRROR/$r/os/$ARCH/";
+	@ents = `curl -s $url`;
+	if($?){
+		print STDERR "$PROG: failed to get FTP listings\n";
+		exit 101;
+	}
+	for(@ents){
+		chomp;
+		next unless(m{([^/]+[.]pkg[.]tar[.]xz)$});
+
+		$file = $1;
+		@fc = split /-/, $file;
+		$pkg = join '-', @fc[0 .. $#fc-3];
+		next unless(delete $PKGS{$pkg});
+
+		if(-f $file){
+			print STDERR "$PROG: $file already exists\n";
+			next
+		}
+
+		print STDERR "$PROG: Downloading $file...\n";
+		if(system 'curl' => ('-s', '-O', $url . $file)){
+			print STDERR "$PROG: failed to download $file\n";
+			unlink $file;
+			exit 102;
+		}
+		print "$r\t$pkg\t$file\n";
+		exit 0 unless(keys %PKGS);
+	}
+}
+
+@notfound = keys %PKGS;
+if(@notfound){
+	print STDERR "$PROG: packages were not found: @notfound\n";
+	exit 103;
+}
