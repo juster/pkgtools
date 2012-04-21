@@ -1,0 +1,6 @@
+These are scripts I made I just wanted to save for later incase of catastrophic
+failure...
+
+findpkgs looks for packages on a specified ArchLinux FTP repository.
+fetchpkgs... um... fetches packages.
+rpathchk was used to check if packages depending on perl had an RPATH set (bad thing)
