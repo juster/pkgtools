@@ -1,0 +1,32 @@
+#!/usr/bin/env perl
+
+use JSON::XS;
+use Getopt::Std;
+
+sub usage
+{
+	print STDERR "usage: $0 [-m person] [-r repo] [search string]\n";
+	exit 2;
+}
+
+getopts('m:r:') or usage;
+$q = shift;
+usage unless($q || $opt_m || $opt_r);
+
+die "$0: invalid char in query\n" if($q =~ /[^a-zA-Z -]/);
+
+$url = "http://www.archlinux.org/packages/search/json/?limit=all&q=$q";
+$url .= "&maintainer=$opt_m" if($opt_m);
+$url .= "&repo=$opt_r" if($opt_r);
+$json = `curl -q -s '$url'`;
+die "$0: curl failed: $json\n" if($?);
+
+$srch = decode_json($json);
+die "$0: no results found?\n" unless($srch->{'valid'});
+
+for $p (@{$srch->{'results'}}){
+	next if($seen{$p->{'pkgname'}}++);
+	$p->{'pkgver'} .= '*' if($p->{'flag_date'});
+	printf "%s\n", join "\t", (map { $p->{$_} } qw/repo pkgname pkgver/),
+		@{$p->{'maintainers'}};
+}
