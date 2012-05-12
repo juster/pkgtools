@@ -26,6 +26,7 @@ die "$0: no results found?\n" unless($srch->{'valid'});
 
 for $p (@{$srch->{'results'}}){
 	next if($seen{$p->{'pkgname'}}++);
+	$p->{'pkgver'} .= '-' . $p->{'pkgrel'};
 	$p->{'pkgver'} .= '*' if($p->{'flag_date'});
 	printf "%s\n", join "\t", (map { $p->{$_} } qw/repo pkgname pkgver/),
 		@{$p->{'maintainers'}};
