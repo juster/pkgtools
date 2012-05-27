@@ -24,9 +24,10 @@ die "$0: curl failed: $json\n" if($?);
 $srch = decode_json($json);
 die "$0: no results found?\n" unless($srch->{'valid'});
 
+@flds = qw/pkgname pkgver repo arch/;
 for $p (@{$srch->{'results'}}){
-	next if($seen{$p->{'pkgname'}}++);
+	$p->{'pkgver'} .= q{-} . $p->{'pkgrel'};
 	$p->{'pkgver'} .= '*' if($p->{'flag_date'});
-	printf "%s\n", join "\t", (map { $p->{$_} } qw/repo pkgname pkgver/),
+	printf "%s\n", join "\t", (map { $p->{$_} } @flds),
 		@{$p->{'maintainers'}};
 }
