@@ -1,0 +1,34 @@
+#!/usr/bin/awk -f
+##
+# Filter a list of perl packages and print out of date versions.
+#
+# Input: [name] [version] [...]
+# Output: [name] [version] [...]
+#
+# This script reads the list of all CPAN distributions from a
+# script called cpandists, which must be in your $PATH.
+
+BEGIN {
+	ovrd["libwww-perl"] = "libwww"
+}
+
+{
+	d = $1
+	if(!sub(/^perl-/, "", d)){
+		d = "app-" d
+	}
+	v = $2
+	sub(/-[0-9]+$/, "", v)
+	sub(/^[0-9]+:/, "", v)
+
+	version[d] = v
+	pkginfo[d] = $0
+}
+
+END {
+	while("cpandists 2>/dev/null" | getline > 0){
+		k = ($1 in ovrd ? ovrd[$1] : tolower($1))
+		if(!(k in version) || $2 == version[k]) continue
+		print pkginfo[k] | "sort"
+	}
+}
