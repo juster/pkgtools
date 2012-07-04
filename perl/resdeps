@@ -1,0 +1,70 @@
+#!/usr/bin/awk -f
+
+BEGIN {
+	PROG = "resdeps"
+	FS = OFS = "\n"; RS = ""
+}
+
+{
+	name = rn[split($1, rn, / /)]
+	$1 = rn[1] "/" rn[2]
+	repo[name] = rn[1]
+	deptxt[name] = $0
+	depcnt++
+
+	for(i = 2; i <= NF; i++){
+		len = split($i, dep, / /)
+		for(j = 2; j <= len; j++){
+			n = dname(dep[j])
+			if(!seen[n]++){
+				names = names n " "
+			}
+		}
+	}
+}
+
+END {
+	FS = OFS = " "; RS = "\n"
+	sub(/ $/, "", names)
+	while("findpkgs " names | getline > 0){
+		repo[$1] = $2
+	}
+
+	for(d in deptxt){
+		linelen = split(deptxt[d], lines, /\n/)
+		print lines[1]
+		for(i = 2; i <= linelen; i++){
+			print resdepln(lines[i])
+		}
+		print ""
+	}
+}
+
+function resdepln(ln)
+{
+	depln = ""
+	depc = split(ln, dep, / /)
+	depln = dep[1]
+	for(j = 2; j <= depc; j++){
+		d = dep[j]
+		n = dname(d)
+		if(!(n in repo) && !warned[n]++){
+			print PROG ": " n " could not be resolved" > "/dev/stderr"
+		}
+		r = repo[dname(d)]
+		depln = depln " " dname(d, r "/" n)
+	}
+	return depln
+}
+
+# Either return the depname or the depstr with name replaced
+function dname(str, newname, len)
+{
+	len = match(str, /[<>=]/)
+	if(!len){
+		len = length(str)
+	}else{
+		len--
+	}
+	return (newname ? newname substr(str, len+1) : substr(str, 1, len))
+}
