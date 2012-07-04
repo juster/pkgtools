@@ -42,6 +42,11 @@ function gendeps (pkgname)
 	path = destdir "/PKGDATA"
 	while(getline<path > 0){
 		if($1 !~ /depends$/) continue
+		if($1 == "optdepends"){
+			for(i = 2; i <= NF; i++){
+				sub(/:.*/, "", $i)
+			}
+		}
 		depslen = 0
 		for(i = 2; i <= NF; i++){
 			deps[$1, ++depslen] = $i
