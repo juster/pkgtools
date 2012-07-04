@@ -1,0 +1,60 @@
+#!/usr/bin/awk -f
+
+BEGIN {
+	FS = "\n"; RS = ""; OFS = " "; ORS = "\n"
+
+	dcolor["depends"] = "black"
+	dcolor["makedepends"] = "purple"
+	dcolor["checkdepends"] = "green"
+	dcolor["optdepends"] = "blue"
+	defdcolor = "red"
+
+	rcolor["core"] = "black"
+	rcolor["extra"] = "blue"
+	rcolor["community"] = "green"
+	defrcolor = "red"
+
+	print "digraph deps {"
+}
+
+{
+	node = $1
+	printnode(node)
+	for(i = 2; i <= NF; i++){
+		printedges(node, $i)
+	}
+}
+
+END {
+	print "}"
+}
+
+function printnode (name)
+{
+	split(name, rn, "/")
+	c = (rn[1] in rcolor ? rcolor[rn[1]] : defrcolor)
+	printf("\"%s\" [color=%s]\n", name, c)
+}
+
+function printedges (src, depln)
+{
+	len = split(depln, deps, " ")
+	if(len < 2) return
+
+	nodelst = ""
+	for(j = 2; j <= len; j++){
+		printedge(src, deps[j], deps[1])
+	}
+}
+
+function printedge (src, dep, type)
+{
+	c = (type in dcolor ? dcolor[type] : defdcolor)
+	if(idx = match(dep, /[<>=]/)){
+		dest = substr(dep, 1, idx - 1)
+		spec = substr(dep, idx)
+		printf("\"%s\" -> \"%s\" [color=%s,label=\"%s\"]\n", src, dest, c, spec)
+	}else{
+		printf("\"%s\" -> \"%s\" [color=%s]\n", src, dep, c)
+	}	
+}
