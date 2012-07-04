@@ -1,43 +1,73 @@
 ARCHLINUX PACKAGE[R] TOOLS
-These scripts help me deal with the drudgery of maintaining packages for ArchLinux's official repositories. Some of them are general purpose so you might find other uses for them.
+These scripts help me deal with the drudgery of maintaining packages for
+ArchLinux's official repositories. Some of them are general purpose so you
+might find other uses for them.
 
 fetchpkgs [package names]
 
-Give this script package names as arguments and it will download them from the ftp.archlinux.org mirror. Prints the repo, package name, and filename for each argument found, not necessarily in the same order. Requires curl.
+Give this script package names as arguments and it will download them from
+the ftp.archlinux.org mirror. Prints the repo, package name, and filename
+for each argument found, not necessarily in the same order. Requires curl.
 
 findpkgs [package names]
 
-This script came after fetchpkgs and only prints the filename of found packages on the FTP repos. Override the MIRROR, ARCH, or REPOS as environment vars if you don't like the defaults. Prints the package name, repo, and filename for each package found. Exits 102 and prints missing packages if any could not be found. I should rewrite fetchpkgs to use this script. Requires curl.
+This script came after fetchpkgs and only prints the filename of found
+packages on the FTP repos. Override the MIRROR, ARCH, or REPOS as
+environment vars if you don't like the defaults. Prints the package name,
+repo, and filename for each package found. Exits 102 and prints missing
+packages if any could not be found. I should rewrite fetchpkgs to use this
+script. Requires curl.
 
 webpkgs [-m person] [-r repo] [search string]
 
-Queries the JSON interface at packages.archlinux.org. Keep in mind the website limits the number of results to a couple hundred. Specify a maintainer, repo, and/or search string. Prints the package name, version, repo, arch, and maintainers. Multiple archs are printed more than once. If the package is flagged out of date an asterisk is appended to the version. There can be one or many maintainers. Guess what? curl in your face.
+Queries the JSON interface at packages.archlinux.org. Keep in mind the
+website limits the number of results to a couple hundred. Specify a
+maintainer, repo, and/or search string. Prints the package name, version,
+repo, arch, and maintainers. Multiple archs are printed more than once. If
+the package is flagged out of date an asterisk is appended to the version.
+There can be one or many maintainers. Guess what? curl in your face.
 
 PERL PACKAGE SCRIPTS
-I poorly maintain perl packages so here are scripts for dealing with that grand role.
+I poorly maintain perl packages so here are scripts for dealing with that
+grand role.
 
 cpandists
 
-Fetches a list of CPAN distributions from cpan.pair.com. Prints the distribution name and its version for every distribution on CPAN. Requires curl.
+Fetches a list of CPAN distributions from cpan.pair.com. Prints the
+distribution name and its version for every distribution on CPAN. Requires
+curl.
 
 perlood
 
-Reads a list of packages, their versions, and etc from standard input. Reads a list of cpan distributions from the cpandists script. This will guess which packages correspond to which CPAN distributions and print out the lines for packages it thinks are out of date. Requires cpandists.
+Reads a list of packages, their versions, and etc from standard input.
+Reads a list of cpan distributions from the cpandists script. This will
+guess which packages correspond to which CPAN distributions and print out
+the lines for packages it thinks are out of date. Requires cpandists.
 
 tododeps [maintainer name]
 
-The real goal here. Reads package names, versions, and repos from standard input. Writes a list of each package and that package's dependencies. The dependencies are traversed until the recursion is exhausted. Packages owned by people other than the supplied maintainer are not printed or traversed. Only orphaned or missing dependencies are traversed. All packages owned by the maintainer are assumed to be fed as input. Requires genpkg to find dependencies of a package. This generates source packages at the same time. Requires webpkgs to check if we need to traverse a package.
+The real goal here. Reads package names, versions, and repos from standard
+input. Writes a list of each package and that package's dependencies. The
+dependencies are traversed until the recursion is exhausted. Packages owned
+by people other than the supplied maintainer are not printed or traversed.
+Only orphaned or missing dependencies are traversed. All packages owned by
+the maintainer are assumed to be fed as input. Requires genpkg to find
+dependencies of a package. This generates source packages at the same time.
+Requires webpkgs to check if we need to traverse a package.
 
 resdeps
 
-Resolves dependencies. Standard input is a dependency list, like tododeps's output. Resolves all package names into their [repo]/[package] absolute name. This makes it easier to graph them.
+Resolves dependencies. Standard input is a dependency list, like tododeps's
+output. Resolves all package names into their [repo]/[package] absolute
+name. This makes it easier to graph them.
 
 DEPENDENCY GRAPHING
 Data visualization makes this torrid mess easier on the eyes.
 
 depdot
 
-Feed this the output of resdeps to create a .dot file that can be fed into a GraphViz graphing program.
+Feed this the output of resdeps to create a .dot file that can be fed into
+a GraphViz graphing program.
 
 EXAMPLES
 
