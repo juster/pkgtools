@@ -75,7 +75,7 @@ Find out of date perl packages that juster maintains:
 webpkgs -m juster | perlood | tododeps juster | tee deps.todo
 
 Draw a graph of all dependencies we need to build:
-cat deps.todo | resdeps | depsdot | neato -Tpng > deps.png
+cat deps.todo | resdeps | depdot | circo -Tpng > deps.png
 
 AUTHOR
 
