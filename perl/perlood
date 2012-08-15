@@ -28,7 +28,15 @@ BEGIN {
 END {
 	while("cpandists 2>/dev/null" | getline > 0){
 		k = ($1 in ovrd ? ovrd[$1] : tolower($1))
-		if(!(k in version) || $2 == version[k]) continue
+		if(!(k in version)) continue
+		v = version[k]
+
+		# String comparison
+		if(("" $2) == v) continue
+
+		# Check if Arch's version is just padded with zeros (Numeric)
+		if(gsub(/[.]/, ".", v) <= 1 && 0+v == 0+$2) continue
+
 		print pkginfo[k] | "sort"
 	}
 }
