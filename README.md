@@ -159,7 +159,7 @@ Requires:
 
 Usage:
 
-	webpkgs -m juster | perlood | tee pkgs.ood
+	webpkgs -m juster | perlood > pkgs.ood
 
 Description:
 
@@ -177,7 +177,7 @@ Requires:
 
 Usage:
 
-	webpkgs -m juster | perlood | tododeps juster | tee pkgs.todo
+	cat pkgs.ood | tododeps juster | tee pkgs.todo
 
 Description:
 
@@ -197,28 +197,28 @@ Requires:
 * [genpkg](https://github.com/juster/genpkg)
 * webpkgs
 
-## resdeps
-
-Usage:
-
-	webpkgs -m juster | perlood | tododeps juster | resdeps | tee pkgdeps.todo
-
-Description:
-
-Resolves dependencies. Standard input is a dependency list, like tododeps's
-output. Resolves all package names into their [repo]/[package] absolute
-name. This makes it easier to graph them.
-
 # Dependency Graphing
 
 Data visualization makes this torrid mess easier. I use GraphViz to plot the
 graph images.
 
+## resdeps
+
+Usage:
+
+	cat pkgs.todo | resdeps > pkgs.todo.abs
+
+Description:
+
+Resolves dependencies into unambiguous names. Standard input is a dependency
+list, like tododeps's output. Resolves all package names into their [repo]/[package]
+absolute name. This makes it easier to graph them.
+
 ## depdot
 
 Usage:
 
-	webpkgs -m juster | perlood | tododeps juster | resdeps | depdot | circo -Tpng > deps.png
+	cat pkgs.todo.abs | depdot | circo -Tpng > deps.png
 
 Feed this the output of resdeps to create a .dot file that can be fed into
 a GraphViz graphing program.
@@ -226,4 +226,5 @@ a GraphViz graphing program.
 # Author
 
 Justin "juster" Davis
+
 <jrcd83@gmail.com>
