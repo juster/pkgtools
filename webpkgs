@@ -28,7 +28,7 @@ $url = "http://www.archlinux.org/packages/search/json/?limit=all&q=$q";
 $url .= "&maintainer=$opt_m" if($opt_m);
 $url .= "&repo=$opt_r" if($opt_r);
 $json = `curl -q -s '$url'`;
-err(101, sprintf("curl failed; code: %d output:\n%s", $? >> 8, $json))
+err(101, sprintf("curl failed; code: %d output:\n%s", $? >> 8, $json)) if($?);
 
 $srch = decode_json($json);
 err(102, 'no results found') unless($srch->{'valid'});
