@@ -48,7 +48,9 @@ themselves is a subset of the data available on the website.
 
 ## fetchpkgs
 
-Usage: `fetchpkgs \[package names\]`
+Usage:
+
+	fetchpkgs [package names]
 
 Description:
 
@@ -73,7 +75,9 @@ Requires:
 
 ## findpkgs
 
-Usage: `findpkgs \[package names\]`
+Usage:
+
+	findpkgs [package names]
 
 Description:
 
@@ -104,7 +108,9 @@ Requires:
 
 ## webpkgs
 
-Usage: `webpkgs \[-m person\] \[-r repo\] \[search string\]`
+Usage:
+
+	webpkgs [-m person] [-r repo] [search string]
 
 Description:
 
@@ -134,7 +140,8 @@ grand role. These are placed inside the perl subdirectory.
 ## cpandists
 
 Usage:
-cpandists
+
+	cpandists > cpan.dist.list
 
 Description:
 Fetches a list of CPAN distributions from <http://cpan.pair.com>. Prints the
@@ -150,7 +157,9 @@ Requires:
 
 ## perlood
 
-Usage: `webpkgs -m juster | perlood | tee pkgs.ood`
+Usage:
+
+	webpkgs -m juster | perlood | tee pkgs.ood
 
 Description:
 
@@ -166,7 +175,9 @@ Requires:
 
 ## tododeps
 
-Usage: `webpkgs -m juster | perlood | tododeps juster | tee pkgs.todo`
+Usage:
+
+	webpkgs -m juster | perlood | tododeps juster | tee pkgs.todo
 
 Description:
 
@@ -188,7 +199,9 @@ Requires:
 
 ## resdeps
 
-Usage: `webpkgs -m juster | perlood | tododeps juster | resdeps | tee pkgdeps.todo`
+Usage:
+
+	webpkgs -m juster | perlood | tododeps juster | resdeps | tee pkgdeps.todo
 
 Description:
 
@@ -203,7 +216,9 @@ graph images.
 
 ## depdot
 
-Usage: `webpkgs -m juster | perlood | tododeps juster | resdeps | depdot | circo -Tpng > deps.png`
+Usage:
+
+	webpkgs -m juster | perlood | tododeps juster | resdeps | depdot | circo -Tpng > deps.png
 
 Feed this the output of resdeps to create a .dot file that can be fed into
 a GraphViz graphing program.
