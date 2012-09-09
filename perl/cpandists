@@ -24,6 +24,7 @@ NR < 10 { next }
 }
 
 END {
+    if (NR == 0) exit(101)
     for (dist in dists) print dist, dists[dist] | "sort"
 }
 
@@ -44,3 +45,4 @@ function decver (vs)
 }
 
 '
+exit $?
