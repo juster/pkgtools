@@ -3,26 +3,35 @@
 use JSON::XS;
 use Getopt::Std;
 
+$PROG = 'webpkgs';
+
 sub usage
 {
-	print STDERR "usage: $0 [-m person] [-r repo] [search string]\n";
+	print STDERR "usage: $PROG [-m person] [-r repo] [search string]\n";
 	exit 2;
+}
+
+sub err
+{
+	my $code = shift;
+	print STDERR "$PROG: ", @_, "\n";
+	exit $code;
 }
 
 getopts('m:r:') or usage;
 $q = shift;
 usage unless($q || $opt_m || $opt_r);
 
-die "$0: invalid char in query\n" if($q =~ /[^a-zA-Z -]/);
+err(103, 'invalid char in query') if($q =~ /[^a-zA-Z -]/);
 
 $url = "http://www.archlinux.org/packages/search/json/?limit=all&q=$q";
 $url .= "&maintainer=$opt_m" if($opt_m);
 $url .= "&repo=$opt_r" if($opt_r);
 $json = `curl -q -s '$url'`;
-die "$0: curl failed: $json\n" if($?);
+err(101, sprintf("curl failed; code: %d output:\n%s", $? >> 8, $json))
 
 $srch = decode_json($json);
-die "$0: no results found?\n" unless($srch->{'valid'});
+err(102, 'no results found') unless($srch->{'valid'});
 
 @flds = qw/pkgname pkgver repo arch/;
 for $p (@{$srch->{'results'}}){
@@ -31,3 +40,5 @@ for $p (@{$srch->{'results'}}){
 	printf "%s\n", join "\t", (map { $p->{$_} } @flds),
 		@{$p->{'maintainers'}};
 }
+
+exit 0;
