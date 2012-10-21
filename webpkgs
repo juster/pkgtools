@@ -24,7 +24,7 @@ usage unless($q || $opt_m || $opt_r);
 
 err(103, 'invalid char in query') if($q =~ /[^a-zA-Z -]/);
 
-$url = "http://www.archlinux.org/packages/search/json/?limit=all&q=$q";
+$url = "https://www.archlinux.org/packages/search/json/?limit=all;q=$q";
 $url .= "&maintainer=$opt_m" if($opt_m);
 $url .= "&repo=$opt_r" if($opt_r);
 $json = `curl -q -s '$url'`;
